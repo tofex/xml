@@ -1,7 +1,7 @@
 {
   "name": "tofex/xml",
   "description": "Tofex XML",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/tofex/xml-writer",
   "license": "MIT",
   "authors": [
@@ -12,7 +12,7 @@
   ],
   "require": {
     "php": ">=7.1.0",
-    "tofex/help": "~1.0.0"
+    "tofex/help": "~1.0.0|~1.1.0"
   },
   "autoload": {
     "psr-4": {
