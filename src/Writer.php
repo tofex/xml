@@ -36,8 +36,8 @@ class Writer
     private $forceCharacterData = [];
 
     /**
-     * @param Files           $fileHelper
-     * @param Arrays          $arrayHelper
+     * @param Files  $fileHelper
+     * @param Arrays $arrayHelper
      */
     public function __construct(Files $fileHelper, Arrays $arrayHelper)
     {
@@ -148,9 +148,9 @@ class Writer
      * Add xml-node with optional data
      *
      * @param XMLWriter $xmlWriter
-     * @param string     $name
-     * @param mixed      $data
-     * @param array      $attributes
+     * @param string    $name
+     * @param mixed     $data
+     * @param array     $attributes
      */
     protected function addElement(XMLWriter $xmlWriter, string $name, $data = null, array $attributes = [])
     {
@@ -176,9 +176,9 @@ class Writer
 
     /**
      * @param XMLWriter $xmlWriter
-     * @param string     $name
-     * @param string     $data
-     * @param array      $attributes
+     * @param string    $name
+     * @param string    $data
+     * @param array     $attributes
      */
     protected function writeData(XMLWriter $xmlWriter, string $name, string $data, array $attributes = [])
     {
@@ -218,12 +218,54 @@ class Writer
      */
     protected function encode(string $text, string $charset = 'UTF-8'): string
     {
-        if (function_exists('iconv') && function_exists('mb_detect_encoding') &&
-            function_exists('mb_detect_order')) {
+        if (function_exists('iconv') && function_exists('mb_detect_encoding') && function_exists('mb_detect_order')) {
 
             $text = iconv(mb_detect_encoding($text, mb_detect_order(), true), $charset, $text);
         }
 
         return $text;
+    }
+
+    /**
+     * @param string $rootElement
+     * @param array  $rootElementAttributes
+     * @param array  $data
+     * @param string $version
+     * @param string $encoding
+     *
+     * @return string
+     */
+    public function output(
+        string $rootElement,
+        array $rootElementAttributes,
+        array $data,
+        string $version = '1.0',
+        string $encoding = 'UTF-8'): string
+    {
+        $xmlWriter = new XMLWriter();
+        $xmlWriter->openMemory();
+        $xmlWriter->setIndent(true);
+        $xmlWriter->setIndentString('  ');
+        $xmlWriter->startDocument($version, $encoding);
+
+        $xmlWriter->startElement($rootElement);
+
+        foreach ($rootElementAttributes as $rootElementAttributeName => $rootElementAttributeValue) {
+            $xmlWriter->writeAttribute($rootElementAttributeName, $rootElementAttributeValue);
+        }
+
+        $output = $xmlWriter->flush(true);
+
+        $this->flushCounter = 0;
+
+        foreach ($data as $key => $value) {
+            $this->addElement($xmlWriter, $key, $value);
+        }
+
+        $xmlWriter->endElement();
+
+        $output .= $xmlWriter->flush(true);
+
+        return $output;
     }
 }
